@@ -16,7 +16,7 @@ def executar_ingestao():
     if os.path.exists(caminho_base_principal):
         print(f"Base principal encontrada em {caminho_base_principal}")
     else:
-        print(f"A base principal NÃO foi encontrada em {caminho_base_principal}.")
+        print(f"A base principal não foi encontrada em {caminho_base_principal}.")
         print("Coloque o arquivo oncological_panel_datasus.csv dentro de data/bruto/")
         
     # 4. Baixar a base secundária
@@ -27,7 +27,7 @@ def executar_ingestao():
         urllib.request.urlretrieve(url_municipios, caminho_base_secundaria)
         print(f"Base secundária salva em {caminho_base_secundaria}")
     except Exception as e:
-        print(f"ERRO ao baixar a base secundária: {e}")
+        print(f"Erro ao baixar a base secundária: {e}")
 
 
 if __name__ == "__main__":
