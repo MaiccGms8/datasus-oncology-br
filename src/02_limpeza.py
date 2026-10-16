@@ -4,8 +4,8 @@ import numpy as np
 def executar_limpeza():
     print("Iniciando limpeza dos dados")
     
-    caminho_csv = 'data/bruto/oncological_panel_datasus.csv'
-    caminho_salvamento = 'data/tratado/oncological_panel_limpo.csv'
+    caminho_csv = 'data/1_bruto/oncological_panel_datasus.csv'
+    caminho_salvamento = 'data/2_tratado/oncological_panel_limpo.csv'
 
     df = pd.read_csv(caminho_csv)
     print(f"Dataset carregado: {df.shape[0]} linhas e {df.shape[1]} colunas.")

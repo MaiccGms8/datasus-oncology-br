@@ -5,7 +5,7 @@ def executar_ingestao():
     print("Iniciando ingestão dos dados")
     
     # Conferindo se a pasta existe
-    pasta_destino = 'data/bruto'
+    pasta_destino = 'data/1_bruto'
     os.makedirs(pasta_destino, exist_ok=True)
     
     # Caminhos dos arquivos
@@ -17,9 +17,9 @@ def executar_ingestao():
         print(f"Base principal encontrada em {caminho_base_principal}")
     else:
         print(f"A base principal não foi encontrada em {caminho_base_principal}.")
-        print("Coloque o arquivo oncological_panel_datasus.csv dentro de data/bruto/")
+        print("Coloque o arquivo oncological_panel_datasus.csv dentro de data/1_bruto/")
         
-    # 4. Baixar a base secundária
+    # Baixar a base secundária
     url_municipios = "https://raw.githubusercontent.com/kelvins/Municipios-Brasileiros/main/csv/municipios.csv"
     
     print(f"Baixando base secundária de: {url_municipios}")
