@@ -54,7 +54,7 @@ def integrar_dados():
 
     print(f"Dimensões da Base Integrada: {df_integrado.shape}")
 
-    # 5. Exportação para data/features
+    # 5. Exportação para data/03_integração
     print(f"\nSalvando resultado final em: {ARQUIVO_SAIDA}")
     df_integrado.to_csv(ARQUIVO_SAIDA, index=False)
     print("Integração concluída com sucesso!")
