@@ -7,12 +7,14 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-data/bruto/*.csv
-data/tratado/*.csv
-data/features/*.csv
-data/split/*.csv
+data/1_bruto/*.csv
+data/2_tratado/*.csv
+data/3_integracao/*.csv
+data/4_features/*.csv
+data/5_split/*.csv
 
-!data/bruto/.gitkeep
-!data/tratado/.gitkeep
-!data/features/.gitkeep
-!data/split/.gitkeep
+!data/1_bruto/.gitkeep
+!data/2_tratado/.gitkeep
+!data/3_integracao/.gitkeep
+!data/4_features/.gitkeep
+!data/5_split/.gitkeep
