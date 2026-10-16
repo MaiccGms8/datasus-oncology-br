@@ -1,64 +1,63 @@
-
-from pathlib import Path
 import pandas as pd
+from pathlib import Path
 
-# Caminho principal do projeto
+# 1. Configuração de caminhos
+
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"
-OUTPUT_DIR = DATA_DIR / "tratado"
 
-# Criar a pasta de saída se não existir
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# Caminhos de entrada
+ARQUIVO_PAINEL = DATA_DIR / "2_tratado" / "oncological_panel_limpo.csv"
+ARQUIVO_MUNICIPIOS = DATA_DIR / "1_bruto" / "municipios.csv"
 
-# Caminhos dos arquivos de entrada
-arquivo_datasus = DATA_DIR / "oncological_panel_datasus.csv"
-arquivo_limpo = DATA_DIR / "oncological_panel_limpo.csv"
+# Caminho de saída
+OUTPUT_DIR = DATA_DIR / "3_integracao"
+ARQUIVO_SAIDA = OUTPUT_DIR / "oncological_panel_integrado.csv"
 
-# Verificar se os arquivos existem
-for arquivo in (arquivo_datasus, arquivo_limpo):
-    if not arquivo.exists():
-        raise FileNotFoundError(
-            f"Arquivo não encontrado: {arquivo}"
-        )
+def integrar_dados():
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Ler as bases
-datasus = pd.read_csv(arquivo_datasus, low_memory=False)
-limpo = pd.read_csv(arquivo_limpo, low_memory=False)
+    for arquivo in [ARQUIVO_PAINEL, ARQUIVO_MUNICIPIOS]:
+        if not arquivo.exists():
+            raise FileNotFoundError(f"Arquivo não encontrado: {arquivo}")
 
-# Limpar espaços dos nomes das colunas
-datasus.columns = datasus.columns.str.strip()
-limpo.columns = limpo.columns.str.strip()
+    print("Lendo as bases de dados...")
+    
+    # 2. Ler as bases
+    painel_df = pd.read_csv(ARQUIVO_PAINEL, low_memory=False)
+    municipios_df = pd.read_csv(ARQUIVO_MUNICIPIOS, low_memory=False)
 
-# Exibir dimensões das bases
-print("=== DIMENSÕES DAS BASES ===")
-print("DATASUS:", datasus.shape)
-print("Base limpa:", limpo.shape)
+    print(f"Dimensões Painel Oncológico: {painel_df.shape}")
+    print(f"Dimensões Municípios: {municipios_df.shape}")
 
-# Exibir nomes das colunas
-print("\n=== COLUNAS DATASUS ===")
-print(datasus.columns.tolist())
+    # 3. Tratamento da chave de integração
+    print("\nAjustando código IBGE de 7 para 6 dígitos...")
+    
+    # Converte o código IBGE para string e pega apenas os 6 primeiros caracteres
+    municipios_df['codigo_ibge_6'] = municipios_df['codigo_ibge'].astype(str).str[:6]
+    
+    # Garantir que a coluna do Datasus também seja lida como string para cruzar corretamente
+    painel_df['MUN_RESID'] = painel_df['MUN_RESID'].astype(str).str.split('.').str[0]
 
-print("\n=== COLUNAS DA BASE LIMPA ===")
-print(limpo.columns.tolist())
+ 
+    # 4. Integração dos dados
+    print("Realizando o cruzamento das tabelas pelo Município de Residência (MUN_RESID)...")
+    
+    # Faz o merge: Trazendo os dados de latitude, longitude e nome do município para o painel
+    df_integrado = pd.merge(
+        painel_df, 
+        municipios_df, 
+        left_on='MUN_RESID', 
+        right_on='codigo_ibge_6', 
+        how='left' # Usamos left para não perder pacientes que por acaso tenham código de município inválido
+    )
 
-# Identificar colunas em comum
-colunas_comuns = sorted(
-    set(datasus.columns).intersection(limpo.columns)
-)
+    print(f"Dimensões da Base Integrada: {df_integrado.shape}")
 
-print("\n=== COLUNAS EM COMUM ===")
-print(colunas_comuns)
+    # 5. Exportação para data/features
+    print(f"\nSalvando resultado final em: {ARQUIVO_SAIDA}")
+    df_integrado.to_csv(ARQUIVO_SAIDA, index=False)
+    print("Integração concluída com sucesso!")
 
-# Salvar relatório da análise
-relatorio = OUTPUT_DIR / "relatorio_integracao.txt"
-
-with open(relatorio, "w", encoding="utf-8") as arquivo:
-    arquivo.write("RELATÓRIO DE INTEGRAÇÃO DAS FONTES\n\n")
-    arquivo.write(f"Dimensões DATASUS: {datasus.shape}\n")
-    arquivo.write(f"Dimensões base limpa: {limpo.shape}\n\n")
-    arquivo.write("Colunas em comum:\n")
-    arquivo.write("\n".join(colunas_comuns))
-    arquivo.write("\n")
-
-print(f"\nRelatório salvo em: {relatorio}")
-print("Verificação das fontes concluída!")
+if __name__ == "__main__":
+    integrar_dados()
