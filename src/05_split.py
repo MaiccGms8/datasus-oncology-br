@@ -34,7 +34,8 @@ def separar_dados():
         df,
         test_size=0.30,
         random_state=42,
-        shuffle=True
+        shuffle=True,
+        stratify=df['ATRASO_60_DIAS']
     )
 
     # Cria a pasta de saída
